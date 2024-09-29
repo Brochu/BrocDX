@@ -1,6 +1,6 @@
+#include "brocdx.h"
 #include <stdio.h>
 
-#include "brocdx.h"
 #include "dxgi1_6.h"
 #include "d3d12.h"
 #include "DirectXMath.h"
@@ -38,6 +38,7 @@ void show_adapter_info(ComPtr<IDXGIAdapter4> adapter) {
 }
 
 // private globals
+HWND hwnd = 0; //Move this to separate file to handle Win32 api
 ComPtr<ID3D12Device> device;
 ComPtr<ID3D12CommandQueue> queue;
 //TODO: Look into handling async compute / multiple command queue / multiple frames in flight
@@ -76,12 +77,6 @@ void bdx_start() {
 
     printf("[BDX] Got device(%p), queue(%p)\n", device.Get(), queue.Get());
     //TODO: Next steps, find how to handle window (raw windows / SDL2?)
-}
-
-void bdx_init_window() {
-}
-
-void bdx_close_window() {
 }
 
 void bdx_stop() {
