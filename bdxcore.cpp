@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "brocdx.h"
 #include "dxgi1_6.h"
 #include "d3d12.h"
 #include "DirectXMath.h"
@@ -8,7 +9,40 @@
 
 using namespace Microsoft::WRL;
 
-void bdx_open() {
+#define HRCHECK(hr)                                                       \
+if (hr != S_OK) {                                                         \
+    printf("[ERROR] HRESULT = 0x%lX at %s:%i\n", hr, __FILE__, __LINE__); \
+}
+
+#define HRASSERT(hr)                         \
+if (hr != S_OK) {                            \
+    printf("[ERROR] HRESULT = 0x%lX\n", hr); \
+    assert(false);                           \
+}
+
+#define HRSUCCESS(hr) (hr == S_OK)
+
+void show_adapter_info(ComPtr<IDXGIAdapter4> adapter) {
+    DXGI_ADAPTER_DESC3 d3;
+    if (HRSUCCESS(adapter->GetDesc3(&d3))) {
+        printf("[BDX] Selected adapter info {\n");
+        printf("\tId: %i;%i;%i;%i\n", d3.VendorId, d3.DeviceId, d3.SubSysId, d3.Revision);
+        printf("\tName: %ls\n", d3.Description);
+        printf("\tDedicated Video Memory: %lld\n", d3.DedicatedVideoMemory);
+        printf("\tDedicated System Memory: %lld\n", d3.DedicatedSystemMemory);
+        printf("\tShared System Memory: %lld\n", d3.SharedSystemMemory);
+        printf("}\n\n");
+    }
+
+    //TODO: Query feature levels for DxR, Work Graphs
+}
+
+// private globals
+ComPtr<ID3D12Device> device;
+ComPtr<ID3D12CommandQueue> queue;
+//TODO: Look into handling async compute / multiple command queue / multiple frames in flight
+
+void bdx_start() {
     using namespace DirectX;
 
     printf("[BDX] Opening library\n");
@@ -16,28 +50,42 @@ void bdx_open() {
     XMMATRIX transform = XMMatrixTranslation(1.f, 1.f, 1.f);
     res = XMMatrixMultiply(res, transform);
 
-    HRESULT hr;
-    ComPtr<IDXGIFactory7> factory;
-    hr = CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory));
-    printf("[BDX] Create DXGI Factory result = %ld\n", hr);
-
-    ComPtr<IDXGIAdapter1> adapter;
-    hr = factory->EnumAdapters1(0, &adapter);
-    printf("[BDX] Getting first adapter = %ld\n", hr);
-
-    DXGI_ADAPTER_DESC1 desc;
-    hr = adapter->GetDesc1(&desc);
-    printf("[BDX] Getting description = (%ld) %ls\n", hr, desc.Description);
-
     ComPtr<ID3D12Debug> debug;
-    hr = D3D12GetDebugInterface(IID_PPV_ARGS(&debug));
-    printf("[BDX] Getting debug interface = (%ld)\n", hr);
+    HRCHECK(D3D12GetDebugInterface(IID_PPV_ARGS(&debug)));
+    //TODO: Only enable debug layers for debug builds
     if (debug.Get()) {
-        printf("[BDX] Starting debug layers\n");
         debug->EnableDebugLayer();
     }
+
+    ComPtr<IDXGIFactory7> factory;
+    ComPtr<IDXGIAdapter4> adapter;
+    HRASSERT(CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory)));
+    HRCHECK(factory->EnumAdapterByGpuPreference(0, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter)));
+
+    show_adapter_info(adapter);
+    HRASSERT(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&device)));
+
+    factory.Reset();
+    adapter.Reset();
+
+    D3D12_COMMAND_QUEUE_DESC qdesc;
+    memset(&qdesc, 0, sizeof(qdesc));
+    qdesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+    qdesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+    HRASSERT(device->CreateCommandQueue(&qdesc, IID_PPV_ARGS(&queue)));
+
+    printf("[BDX] Got device(%p), queue(%p)\n", device.Get(), queue.Get());
+    //TODO: Next steps, find how to handle window (raw windows / SDL2?)
 }
 
-void bdx_close() {
+void bdx_init_window() {
+}
+
+void bdx_close_window() {
+}
+
+void bdx_stop() {
     printf("[BDX] Closing library\n");
+    queue.Reset();
+    device.Reset();
 }
