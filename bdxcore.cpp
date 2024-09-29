@@ -1,9 +1,9 @@
 #include <stdio.h>
 
-void broc_open() {
+void bdx_open() {
     printf("[LIB] Opening library\n");
 }
 
-void broc_close() {
+void bdx_close() {
     printf("[LIB] Closing library\n");
 }

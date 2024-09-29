@@ -1,4 +1,4 @@
 @echo off
 
-cl -nologo -c -std:c++14 broccore.cpp
-lib -nologo broccore.obj -out:brocdx.lib
+cl -nologo -c -std:c++14 bdxcore.cpp
+lib -nologo bdxcore.obj -out:brocdx.lib

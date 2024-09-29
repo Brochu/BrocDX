@@ -5,8 +5,8 @@
 
 int main(int argc, char **argv) {
     printf("[MAIN] Starting application\n");
-    broc_open();
+    bdx_open();
 
-    broc_close();
+    bdx_close();
     return EXIT_SUCCESS;
 }
