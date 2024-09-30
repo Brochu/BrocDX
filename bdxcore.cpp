@@ -1,4 +1,6 @@
 #include "brocdx.h"
+#include "bdxwin.h"
+
 #include <stdio.h>
 
 #include "dxgi1_6.h"
@@ -38,7 +40,6 @@ void show_adapter_info(ComPtr<IDXGIAdapter4> adapter) {
 }
 
 // private globals
-HWND hwnd = 0; //Move this to separate file to handle Win32 api
 ComPtr<ID3D12Device> device;
 ComPtr<ID3D12CommandQueue> queue;
 //TODO: Look into handling async compute / multiple command queue / multiple frames in flight
@@ -50,6 +51,9 @@ void bdx_start() {
     XMMATRIX res = XMMatrixIdentity();
     XMMATRIX transform = XMMatrixTranslation(1.f, 1.f, 1.f);
     res = XMMatrixMultiply(res, transform);
+
+    printf("[BDX] Create Win32 window (hwnd = 0x%p)\n", hwnd);
+    bdx_init_window();
 
     ComPtr<ID3D12Debug> debug;
     HRCHECK(D3D12GetDebugInterface(IID_PPV_ARGS(&debug)));
@@ -83,4 +87,6 @@ void bdx_stop() {
     printf("[BDX] Closing library\n");
     queue.Reset();
     device.Reset();
+
+    bdx_close_window();
 }
