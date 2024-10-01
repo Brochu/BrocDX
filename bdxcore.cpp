@@ -44,7 +44,7 @@ ComPtr<ID3D12Device> device;
 ComPtr<ID3D12CommandQueue> queue;
 //TODO: Look into handling async compute / multiple command queue / multiple frames in flight
 
-void bdx_start() {
+void bdx_start(HINSTANCE hInstance, int nShowCmd) {
     using namespace DirectX;
 
     printf("[BDX] Opening library\n");
@@ -53,7 +53,8 @@ void bdx_start() {
     res = XMMatrixMultiply(res, transform);
 
     printf("[BDX] Create Win32 window (hwnd = 0x%p)\n", hwnd);
-    bdx_init_window();
+    bdx_init_window(hInstance, nShowCmd);
+    printf("[BDX] Created Win32 window (hwnd = 0x%p)\n", hwnd);
 
     ComPtr<ID3D12Debug> debug;
     HRCHECK(D3D12GetDebugInterface(IID_PPV_ARGS(&debug)));

@@ -5,8 +5,9 @@
 #include <windows.h>
 
 extern HWND hwnd;
+extern bool running;
 
-void bdx_init_window();
+void bdx_init_window(HINSTANCE hInstance, int nShowCmd);
 void bdx_close_window();
 
 #endif //BDXWIN_H
