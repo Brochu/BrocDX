@@ -14,7 +14,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     freopen_s(&empty, "CONOUT$", "w", stderr);
 
     printf("[APP] Starting application\n");
-    bdx_start();
+    bdx_start(hInstance, nShowCmd);
 
     printf("[APP] Running logic here\n");
 
