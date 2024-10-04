@@ -10,6 +10,7 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpar
     // TODO: Think about how to send inputs to core
 
     case WM_DESTROY:
+    case WM_QUIT:
         running = false;
         return 0;
 
@@ -42,17 +43,23 @@ void bdx_init_window(HINSTANCE hInstance, int nShowCmd/*, LONG width, LONG heigh
     );
 
     ShowWindow(hwnd, nShowCmd);
+}
 
-    //TODO: The main loop needs to be driven by the application, cannot be in init
+bool bdx_win_running() {
     MSG m = { 0 };
-    while (m.message != WM_QUIT) {
-        if (PeekMessage(&m, NULL, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&m);
-            DispatchMessage(&m);
+    while (PeekMessage(&m, NULL, 0, 0, PM_REMOVE)) {
+        if (m.message == WM_QUIT) {
+            return false;
         }
+
+        TranslateMessage(&m);
+        DispatchMessage(&m);
     }
+
+    return running;
 }
 
 void bdx_close_window() {
     printf("[WIN] Closing Win32 window\n");
+    DestroyWindow(hwnd);
 }

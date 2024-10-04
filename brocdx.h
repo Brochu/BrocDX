@@ -7,4 +7,6 @@
 void bdx_start(HINSTANCE hInstance, int nShowCmd);
 void bdx_stop();
 
+bool bdx_win_running();
+
 #endif //BROCDX_H

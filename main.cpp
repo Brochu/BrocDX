@@ -17,6 +17,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     bdx_start(hInstance, nShowCmd);
 
     printf("[APP] Running logic here\n");
+    while (bdx_win_running()) {
+        // Logic here
+    }
 
     bdx_stop();
     printf("[APP] Stopping application\n");
