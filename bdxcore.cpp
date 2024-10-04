@@ -43,6 +43,7 @@ void show_adapter_info(ComPtr<IDXGIAdapter4> adapter) {
 ComPtr<ID3D12Device> device;
 ComPtr<ID3D12CommandQueue> queue;
 //TODO: Look into handling async compute / multiple command queue / multiple frames in flight
+ComPtr<IDXGISwapChain1> swapchain;
 
 void bdx_start(HINSTANCE hInstance, int nShowCmd) {
     using namespace DirectX;
@@ -71,8 +72,6 @@ void bdx_start(HINSTANCE hInstance, int nShowCmd) {
     show_adapter_info(adapter);
     HRASSERT(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&device)));
 
-    factory.Reset();
-    adapter.Reset();
 
     D3D12_COMMAND_QUEUE_DESC qdesc;
     memset(&qdesc, 0, sizeof(qdesc));
@@ -82,10 +81,26 @@ void bdx_start(HINSTANCE hInstance, int nShowCmd) {
 
     printf("[BDX] Got device(%p), queue(%p)\n", device.Get(), queue.Get());
     //TODO: Next steps, find how to handle window (raw windows / SDL2?)
+
+    DXGI_SWAP_CHAIN_DESC1 swapdesc = { 0 };
+    swapdesc.Width = 800;
+    swapdesc.Height = 600;
+    swapdesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    swapdesc.SampleDesc.Count = 1;
+    swapdesc.SampleDesc.Quality = 0;
+    swapdesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    swapdesc.BufferCount = 2; //TODO: Look into frames in flight
+    swapdesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+    HRESULT hr = factory->CreateSwapChainForHwnd(queue.Get(), hwnd, &swapdesc, NULL, NULL, &swapchain);
+    printf("[BDX] Created swapchain for the main Win32 window (%p) (%lx)\n", swapchain.Get(), hr);
+
+    factory.Reset();
+    adapter.Reset();
 }
 
 void bdx_stop() {
     printf("[BDX] Closing library\n");
+    swapchain.Reset();
     queue.Reset();
     device.Reset();
 
