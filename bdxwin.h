@@ -7,7 +7,7 @@
 extern HWND hwnd;
 extern bool running;
 
-void bdx_init_window(HINSTANCE hInstance, int nShowCmd);
+void bdx_init_window(HINSTANCE hInstance, int nShowCmd, int width, int height, const char *title);
 void bdx_close_window();
 
 #endif //BDXWIN_H

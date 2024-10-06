@@ -4,6 +4,9 @@
 
 #include "brocdx.h"
 
+#define WIDTH 1152
+#define HEIGHT 864
+
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
     if (!AllocConsole()) {
         return 1;
@@ -14,7 +17,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     freopen_s(&empty, "CONOUT$", "w", stderr);
 
     printf("[APP] Starting application\n");
-    bdx_start(hInstance, nShowCmd);
+    bdx_start(hInstance, nShowCmd, WIDTH, HEIGHT, "BrocDX - Sample App");
 
     printf("[APP] Running logic here\n");
     while (bdx_win_running()) {

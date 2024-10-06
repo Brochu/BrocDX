@@ -45,7 +45,7 @@ ComPtr<ID3D12CommandQueue> queue;
 //TODO: Look into handling async compute / multiple command queue / multiple frames in flight
 ComPtr<IDXGISwapChain1> swapchain;
 
-void bdx_start(HINSTANCE hInstance, int nShowCmd) {
+void bdx_start(HINSTANCE hInstance, int nShowCmd, int width, int height, const char *title) {
     using namespace DirectX;
 
     printf("[BDX] Opening library\n");
@@ -54,7 +54,7 @@ void bdx_start(HINSTANCE hInstance, int nShowCmd) {
     res = XMMatrixMultiply(res, transform);
 
     printf("[BDX] Create Win32 window (hwnd = 0x%p)\n", hwnd);
-    bdx_init_window(hInstance, nShowCmd);
+    bdx_init_window(hInstance, nShowCmd, width, height, title);
     printf("[BDX] Created Win32 window (hwnd = 0x%p)\n", hwnd);
 
     ComPtr<ID3D12Debug> debug;
@@ -83,8 +83,8 @@ void bdx_start(HINSTANCE hInstance, int nShowCmd) {
     //TODO: Next steps, find how to handle window (raw windows / SDL2?)
 
     DXGI_SWAP_CHAIN_DESC1 swapdesc = { 0 };
-    swapdesc.Width = 800;
-    swapdesc.Height = 600;
+    swapdesc.Width = width;
+    swapdesc.Height = height;
     swapdesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     swapdesc.SampleDesc.Count = 1;
     swapdesc.SampleDesc.Quality = 0;

@@ -19,7 +19,7 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpar
     return DefWindowProc(hwnd, message, wparam, lparam);
 }
 
-void bdx_init_window(HINSTANCE hInstance, int nShowCmd/*, LONG width, LONG height, const char *title*/) {
+void bdx_init_window(HINSTANCE hInstance, int nShowCmd, int width, int height, const char *title) {
     printf("[WIN] Creating Win32 window\n");
     printf("\thInstance=0x%p ; nShowCmd=%i ; hwnd = 0x%p\n", hInstance, nShowCmd, hwnd);
 
@@ -32,14 +32,14 @@ void bdx_init_window(HINSTANCE hInstance, int nShowCmd/*, LONG width, LONG heigh
     wndClass.lpszClassName = "BrocDXWindowClass";
     RegisterClassEx(&wndClass);
 
-    RECT wrect = { 0, 0, 800, 600 };
+    RECT wrect = { 0, 0, width, height };
     AdjustWindowRect(&wrect, WS_OVERLAPPEDWINDOW, FALSE);
 
 
     hwnd = CreateWindow(
-        wndClass.lpszClassName, "INSERT TITILE HERE",
+        wndClass.lpszClassName, title,
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
-        800, 600, nullptr, nullptr, hInstance, nullptr
+        width, height, nullptr, nullptr, hInstance, nullptr
     );
 
     ShowWindow(hwnd, nShowCmd);
