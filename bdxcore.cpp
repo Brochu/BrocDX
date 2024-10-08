@@ -43,7 +43,7 @@ void show_adapter_info(ComPtr<IDXGIAdapter4> adapter) {
 ComPtr<ID3D12Device> device;
 ComPtr<ID3D12CommandQueue> queue;
 //TODO: Look into handling async compute / multiple command queue / multiple frames in flight
-ComPtr<IDXGISwapChain1> swapchain;
+ComPtr<IDXGISwapChain4> swapchain;
 
 void bdx_start(HINSTANCE hInstance, int nShowCmd, int width, int height, const char *title) {
     using namespace DirectX;
@@ -82,6 +82,7 @@ void bdx_start(HINSTANCE hInstance, int nShowCmd, int width, int height, const c
     printf("[BDX] Got device(%p), queue(%p)\n", device.Get(), queue.Get());
     //TODO: Next steps, find how to handle window (raw windows / SDL2?)
 
+    ComPtr<IDXGISwapChain1> sc;
     DXGI_SWAP_CHAIN_DESC1 swapdesc = { 0 };
     swapdesc.Width = width;
     swapdesc.Height = height;
@@ -91,8 +92,18 @@ void bdx_start(HINSTANCE hInstance, int nShowCmd, int width, int height, const c
     swapdesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapdesc.BufferCount = 2; //TODO: Look into frames in flight
     swapdesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-    HRESULT hr = factory->CreateSwapChainForHwnd(queue.Get(), hwnd, &swapdesc, NULL, NULL, &swapchain);
-    printf("[BDX] Created swapchain for the main Win32 window (%p) (%lx)\n", swapchain.Get(), hr);
+
+    HRASSERT(factory->CreateSwapChainForHwnd(queue.Get(), hwnd, &swapdesc, NULL, NULL, &sc));
+    HRASSERT(factory->MakeWindowAssociation(hwnd, DXGI_MWA_NO_ALT_ENTER));
+    HRASSERT(sc.As(&swapchain));
+    printf("[BDX] Created swapchain for the main Win32 window (%p)\n", swapchain.Get());
+
+    ComPtr<ID3D12Resource> backbuffer;
+    UINT idx = swapchain->GetCurrentBackBufferIndex();
+    printf("[BDX] Getting current backbuffer index = %i\n", idx);
+    HRESULT hr = swapchain->GetBuffer(0, IID_PPV_ARGS(&backbuffer));
+    printf("[BDX] Getting backbuffer resource at %i (0x%p) (%lx)\n", idx, backbuffer.Get(), hr);
+    //TODO: Create heaps, fetch swapchain backbuffers, create depth RTs
 
     factory.Reset();
     adapter.Reset();
