@@ -1,13 +1,37 @@
 #include "bdxwin.h"
+#include "brocdx.h"
+
 #include <stdio.h>
 
 HWND hwnd = (HWND)11;
 bool running = true;
+bool mouse_buttons[3] = { false, false, false };
 
 LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam) {
     switch (message) {
 
     // TODO: Think about how to send inputs to core
+
+    case WM_LBUTTONDOWN:
+            mouse_buttons[0] = true;
+        break;
+    case WM_LBUTTONUP:
+            mouse_buttons[0] = false;
+        break;
+
+    case WM_RBUTTONDOWN:
+            mouse_buttons[1] = true;
+        break;
+    case WM_RBUTTONUP:
+            mouse_buttons[1] = false;
+        break;
+
+    case WM_MBUTTONDOWN:
+            mouse_buttons[2] = true;
+        break;
+    case WM_MBUTTONUP:
+            mouse_buttons[2] = false;
+        break;
 
     case WM_DESTROY:
     case WM_QUIT:
@@ -45,6 +69,11 @@ void bdx_init_window(HINSTANCE hInstance, int nShowCmd, int width, int height, c
     ShowWindow(hwnd, nShowCmd);
 }
 
+void bdx_close_window() {
+    printf("[WIN] Closing Win32 window\n");
+    DestroyWindow(hwnd);
+}
+
 bool bdx_win_running() {
     MSG m = { 0 };
     while (PeekMessage(&m, NULL, 0, 0, PM_REMOVE)) {
@@ -59,7 +88,6 @@ bool bdx_win_running() {
     return running;
 }
 
-void bdx_close_window() {
-    printf("[WIN] Closing Win32 window\n");
-    DestroyWindow(hwnd);
+bool bdx_mbutton_down(MBUTTON button) {
+    return mouse_buttons[button];
 }

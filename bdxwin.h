@@ -6,6 +6,7 @@
 
 extern HWND hwnd;
 extern bool running;
+extern bool mouse_buttons[3];
 
 void bdx_init_window(HINSTANCE hInstance, int nShowCmd, int width, int height, const char *title);
 void bdx_close_window();
